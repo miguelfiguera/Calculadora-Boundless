@@ -114,16 +114,16 @@ export const useSalesCut = (user: string | null = null) => {
     const currentDate = new Date().toLocaleDateString('es-ES');
     const pagoConSubvencion = data.pagoCliente - data.montoSubvencion;
 
-    let text = `Sistema: ${data.numeroPlacas} ${data.watts} Baterías: ${data.numeroBaterias}
+    let text = `Sistema: ${data.numeroPlacas} Placas - ${data.watts} Watts + Baterías: ${data.numeroBaterias}
 Nombre del Cliente: ${data.nombreCliente}
 EPC de venta: ${data.epcVenta || ''}
 Ganancia Consultor por kw: ${formatDecimal(calculations.diferencial)}
 Ganancia Consultor (-10%): $${formatDecimal(calculations.gananciaConsultorNeta, 2)}
-Pago Cliente: ${data.pagoCliente || ''}`;
+Pago Cliente: $${data.pagoCliente || ''}`;
 
     // Solo agregar pago con subvención si ES Horizon
     if (user === 'Horizon') {
-      text += `\nPago Cliente con subvención: ${pagoConSubvencion}`;
+      text += `\nPago Cliente con subvención: $${pagoConSubvencion}`;
     }
 
     text += `\nFecha: ${currentDate}`;
