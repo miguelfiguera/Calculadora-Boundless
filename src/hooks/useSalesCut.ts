@@ -32,7 +32,7 @@ export interface SalesCutResults {
 }
 
 const getInitialData = (user: string | null): SalesCutData => {
-  let redline = 0;
+  let redline = 2.35; // Valor por defecto para cualquier otro usuario
 
   switch (user) {
     case 'Horizon':
@@ -43,7 +43,7 @@ const getInitialData = (user: string | null): SalesCutData => {
       redline = 2.20;
       break;
     default:
-      redline = 0;
+      redline = 2.35; // Usuarios no listados originalmente
   }
 
   return {
