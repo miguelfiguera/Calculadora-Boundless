@@ -3,19 +3,21 @@ export interface Account {
   password: string;
 }
 
-export const cuentasAutorizadas: Record<string, Account> = {
-  "RR-Advisor": {
-    user: "r.jimenez@rradvisor.net",
-    password: "VayaPalCarajo2025..",
-  },
-  Horizon: {
-    user: "customerservice@horizonsun.net",
-    password: "siosi2025..",
-  },
-  Elias: {
-    user: "pramirez@maximoenergy.net.sr",
-    password: "Maximo2025$@",
-  },
+const getAccountsFromEnv = (): Record<string, Account> => {
+  return {
+    "RR-Advisor": {
+      user: import.meta.env.VITE_RR_ADVISOR_USER || "",
+      password: import.meta.env.VITE_RR_ADVISOR_PASSWORD || "",
+    },
+    Horizon: {
+      user: import.meta.env.VITE_HORIZON_USER || "",
+      password: import.meta.env.VITE_HORIZON_PASSWORD || "",
+    },
+    Elias: {
+      user: import.meta.env.VITE_ELIAS_USER || "",
+      password: import.meta.env.VITE_ELIAS_PASSWORD || "",
+    },
+  };
 };
 
 export const validateCredentials = (
@@ -26,7 +28,9 @@ export const validateCredentials = (
   const trimmedUsername = username.trim();
   const trimmedPassword = password.trim();
 
-  for (const [accountName, account] of Object.entries(cuentasAutorizadas)) {
+  const accounts = getAccountsFromEnv();
+
+  for (const [accountName, account] of Object.entries(accounts)) {
     if (
       account.user === trimmedUsername &&
       account.password === trimmedPassword
