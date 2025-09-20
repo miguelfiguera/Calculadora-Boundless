@@ -146,10 +146,6 @@ describe('useSalesCut Hook', () => {
       result.current.updateField('redline', 3.14159);
     });
 
-    const size = 999;
-    const precioPlacas = size * 3.14159;
-    const epcMinimo = precioPlacas / size;
-
     expect(result.current.results.epcMinimoSunrun).toBe('3.141');
   });
 
