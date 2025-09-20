@@ -6,7 +6,7 @@ import Results from './Results';
 
 const Calculator: React.FC = () => {
   const { user, logout } = useAuth();
-  const { data, results, updateField, copyToClipboard, reset } = useSalesCut();
+  const { data, results, updateField, copyToClipboard, reset } = useSalesCut(user);
   const [copied, setCopied] = useState(false);
   const isHorizon = user === 'Horizon';
 

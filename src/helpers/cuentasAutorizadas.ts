@@ -22,26 +22,18 @@ export const validateCredentials = (
   username: string,
   password: string
 ): string | null => {
-  console.log("Intentando login con:", { username, password });
-
   // Eliminar espacios en blanco
   const trimmedUsername = username.trim();
   const trimmedPassword = password.trim();
 
   for (const [accountName, account] of Object.entries(cuentasAutorizadas)) {
-    console.log("Comparando con:", accountName, account);
-    console.log("Usuario coincide?:", account.user === trimmedUsername);
-    console.log("Password coincide?:", account.password === trimmedPassword);
-
     if (
       account.user === trimmedUsername &&
       account.password === trimmedPassword
     ) {
-      console.log("Login exitoso como:", accountName);
       return accountName;
     }
   }
 
-  console.log("Login fallido");
   return null;
 };

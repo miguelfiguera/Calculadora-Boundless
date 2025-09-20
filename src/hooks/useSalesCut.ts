@@ -30,20 +30,36 @@ export interface SalesCutResults {
   diferencial: string;
 }
 
-const initialData: SalesCutData = {
-  nombreCliente: '',
-  watts: 0,
-  numeroPlacas: 0,
-  redline: 0,
-  precioBateria: 0,
-  numeroBaterias: 0,
-  gananciaConsultor: 0,
-  epcVenta: 0,
-  pagoCliente: 0,
+const getInitialData = (user: string | null): SalesCutData => {
+  let redline = 0;
+
+  switch (user) {
+    case 'Horizon':
+    case 'Elias':
+      redline = 2.10;
+      break;
+    case 'RR-Advisor':
+      redline = 2.20;
+      break;
+    default:
+      redline = 0;
+  }
+
+  return {
+    nombreCliente: '',
+    watts: 0,
+    numeroPlacas: 0,
+    redline,
+    precioBateria: 11200,
+    numeroBaterias: 0,
+    gananciaConsultor: 0,
+    epcVenta: 0,
+    pagoCliente: 0,
+  };
 };
 
-export const useSalesCut = () => {
-  const [data, setData] = useState<SalesCutData>(initialData);
+export const useSalesCut = (user: string | null = null) => {
+  const [data, setData] = useState<SalesCutData>(() => getInitialData(user));
 
   const updateField = useCallback((field: keyof SalesCutData, value: string | number) => {
     setData(prev => ({
@@ -56,14 +72,22 @@ export const useSalesCut = () => {
     const size = data.watts * data.numeroPlacas;
     const precioPlacas = size * data.redline;
     const precioTotal = precioPlacas + (data.precioBateria * data.numeroBaterias);
-    const epcMinimo = size > 0 ? precioTotal / size : 0;
-    const diferencial = data.gananciaConsultor + epcMinimo - epcMinimo;
+    const epcBase = size > 0 ? precioTotal / size : 0;
 
+    let epcMinimo = 0;
+    let diferencial = 0;
     let gananciaConsultorNeta = 0;
+
     if (!data.epcVenta || data.epcVenta === 0) {
+      // Si NO hay EPC de venta, el EPC mínimo incluye la ganancia del consultor
+      epcMinimo = epcBase + data.gananciaConsultor;
+      diferencial = data.gananciaConsultor;
       gananciaConsultorNeta = (diferencial * size) * 0.9;
-    } else if (data.epcVenta > 0) {
-      gananciaConsultorNeta = ((data.epcVenta - epcMinimo) * size) * 0.9;
+    } else {
+      // Si HAY EPC de venta, el EPC mínimo es solo el base y el diferencial se calcula
+      epcMinimo = epcBase;
+      diferencial = data.epcVenta - epcBase;
+      gananciaConsultorNeta = (diferencial * size) * 0.9;
     }
 
     return {
@@ -79,7 +103,7 @@ export const useSalesCut = () => {
   const results = useMemo<SalesCutResults>(() => ({
     sizeKW: formatDecimal(calculations.size / 1000),
     costoTotalEquipo: formatDecimal(calculations.precioTotal),
-    gananciaConsultorNeta: formatDecimal(calculations.gananciaConsultorNeta),
+    gananciaConsultorNeta: formatDecimal(calculations.gananciaConsultorNeta, 2),
     epcMinimoSunrun: formatDecimal(calculations.epcMinimo),
     diferencial: formatDecimal(calculations.diferencial)
   }), [calculations]);
@@ -92,7 +116,7 @@ export const useSalesCut = () => {
 Nombre del Cliente: ${data.nombreCliente}
 EPC de venta: ${data.epcVenta || ''}
 Ganancia Consultor por kw: ${formatDecimal(calculations.diferencial)}
-Ganancia Consultor (-10%): $${formatDecimal(calculations.gananciaConsultorNeta)}
+Ganancia Consultor (-10%): $${formatDecimal(calculations.gananciaConsultorNeta, 2)}
 Pago Cliente: ${data.pagoCliente || ''}
 Pago Cliente con subvención: ${pagoConSubvencion}
 Fecha: ${currentDate}`;
@@ -102,8 +126,8 @@ Fecha: ${currentDate}`;
   }, [data, calculations]);
 
   const reset = useCallback(() => {
-    setData(initialData);
-  }, []);
+    setData(getInitialData(user));
+  }, [user]);
 
   return {
     data,

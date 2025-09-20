@@ -22,7 +22,7 @@ const Results: React.FC<ResultsProps> = ({ results }) => {
         </div>
 
         <div className="bg-gray-700 rounded-lg p-4">
-          <p className="text-gray-400 text-sm mb-1">Ganancia del Consultor Neta</p>
+          <p className="text-gray-400 text-sm mb-1">Ganancia del Consultor Neta (-10%)</p>
           <p className="text-green-400 text-lg font-semibold">${results.gananciaConsultorNeta || '0'}</p>
         </div>
 

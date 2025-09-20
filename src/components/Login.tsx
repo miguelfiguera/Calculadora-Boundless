@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { cuentasAutorizadas } from '../helpers/cuentasAutorizadas';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showCredentials, setShowCredentials] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -30,6 +28,16 @@ const Login: React.FC = () => {
           <h1 className="text-3xl font-bold text-white text-center mb-2">
             Maximo Energy Calculator
           </h1>
+          <p className="text-gray-500 text-center text-xs mb-3">
+            MadeBy - <a
+              href="https://github.com/miguelfiguera"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Perrosaurio
+            </a>
+          </p>
           <p className="text-gray-400 text-center text-sm">
             Ingresa tus credenciales para continuar
           </p>
@@ -79,36 +87,6 @@ const Login: React.FC = () => {
             Iniciar Sesión
           </button>
         </form>
-
-        <div className="mt-6">
-          <button
-            type="button"
-            onClick={() => setShowCredentials(!showCredentials)}
-            className="w-full text-sm text-gray-400 hover:text-gray-300 transition-colors"
-          >
-            {showCredentials ? 'Ocultar' : 'Mostrar'} credenciales de prueba
-          </button>
-
-          {showCredentials && (
-            <div className="mt-4 space-y-2 bg-gray-700/50 p-4 rounded-lg">
-              {Object.entries(cuentasAutorizadas).map(([name, account]) => (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => {
-                    setUsername(account.user);
-                    setPassword(account.password);
-                    setError('');
-                  }}
-                  className="block w-full text-left text-sm p-2 hover:bg-gray-600 rounded transition-colors"
-                >
-                  <div className="text-white font-medium">{name}</div>
-                  <div className="text-gray-400 text-xs truncate">{account.user}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
