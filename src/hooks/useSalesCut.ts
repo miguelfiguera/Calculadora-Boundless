@@ -11,6 +11,7 @@ export interface SalesCutData {
   gananciaConsultor: number;
   epcVenta: number;
   pagoCliente: number;
+  montoSubvencion: number;
 }
 
 export interface SalesCutCalculations {
@@ -55,6 +56,7 @@ const getInitialData = (user: string | null): SalesCutData => {
     gananciaConsultor: 0,
     epcVenta: 0,
     pagoCliente: 0,
+    montoSubvencion: 400,
   };
 };
 
@@ -110,20 +112,25 @@ export const useSalesCut = (user: string | null = null) => {
 
   const copyToClipboard = useCallback(() => {
     const currentDate = new Date().toLocaleDateString('es-ES');
-    const pagoConSubvencion = data.pagoCliente - 400;
+    const pagoConSubvencion = data.pagoCliente - data.montoSubvencion;
 
-    const text = `Sistema: ${data.numeroPlacas} ${data.watts} Baterías: ${data.numeroBaterias}
+    let text = `Sistema: ${data.numeroPlacas} ${data.watts} Baterías: ${data.numeroBaterias}
 Nombre del Cliente: ${data.nombreCliente}
 EPC de venta: ${data.epcVenta || ''}
 Ganancia Consultor por kw: ${formatDecimal(calculations.diferencial)}
 Ganancia Consultor (-10%): $${formatDecimal(calculations.gananciaConsultorNeta, 2)}
-Pago Cliente: ${data.pagoCliente || ''}
-Pago Cliente con subvención: ${pagoConSubvencion}
-Fecha: ${currentDate}`;
+Pago Cliente: ${data.pagoCliente || ''}`;
+
+    // Solo agregar pago con subvención si ES Horizon
+    if (user === 'Horizon') {
+      text += `\nPago Cliente con subvención: ${pagoConSubvencion}`;
+    }
+
+    text += `\nFecha: ${currentDate}`;
 
     navigator.clipboard.writeText(text);
     return text;
-  }, [data, calculations]);
+  }, [data, calculations, user]);
 
   const reset = useCallback(() => {
     setData(getInitialData(user));

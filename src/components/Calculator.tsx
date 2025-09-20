@@ -111,14 +111,25 @@ const Calculator: React.FC = () => {
               required={false}
             />
 
+            <InputField
+              label="Pago Cliente"
+              name="pagoCliente"
+              value={data.pagoCliente}
+              onChange={(value) => updateField('pagoCliente', parseFloat(value) || 0)}
+              placeholder="Pago del cliente"
+              isDecimal={true}
+              required={false}
+            />
+
             {isHorizon && (
               <InputField
-                label="Pago Cliente"
-                name="pagoCliente"
-                value={data.pagoCliente}
-                onChange={(value) => updateField('pagoCliente', parseFloat(value) || 0)}
-                placeholder="Pago del cliente"
+                label="Monto Subvención ($)"
+                name="montoSubvencion"
+                value={data.montoSubvencion}
+                onChange={(value) => updateField('montoSubvencion', parseFloat(value) || 0)}
+                placeholder="Monto de la subvención"
                 isDecimal={true}
+                required={false}
               />
             )}
           </div>
