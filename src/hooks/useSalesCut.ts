@@ -12,6 +12,9 @@ export interface SalesCutData {
   epcVenta: number;
   pagoCliente: number;
   montoSubvencion: number;
+  leadFee: number;
+  adders: number;
+  porcentajeComisionConsultor: number;
 }
 
 export interface SalesCutCalculations {
@@ -21,6 +24,13 @@ export interface SalesCutCalculations {
   epcMinimo: number;
   diferencial: number;
   gananciaConsultorNeta: number;
+  precioVenta: number;
+  comisionInstaladora: number;
+  ochentaPorciento: number;
+  montoDisponible: number;
+  comisionConsultor: number;
+  comisionGerente: number;
+  gananciaBruta: number;
 }
 
 export interface SalesCutResults {
@@ -29,10 +39,15 @@ export interface SalesCutResults {
   gananciaConsultorNeta: string;
   epcMinimoSunrun: string;
   diferencial: string;
+  comisionInstaladora: string;
+  comisionConsultor: string;
+  comisionGerente: string;
+  gananciaBruta: string;
 }
 
 const getInitialData = (user: string | null): SalesCutData => {
   let redline = 2.35; // Valor por defecto para cualquier otro usuario
+  let precioBateria = 11200; // Valor por defecto
 
   switch (user) {
     case 'Horizon':
@@ -41,6 +56,10 @@ const getInitialData = (user: string | null): SalesCutData => {
       break;
     case 'RR-Advisor':
       redline = 2.20;
+      break;
+    case 'JRamos':
+      redline = 1.52; // Baseline para Boundless
+      precioBateria = 9000; // Precio de batería para Boundless
       break;
     default:
       redline = 2.35; // Usuarios no listados originalmente
@@ -51,12 +70,15 @@ const getInitialData = (user: string | null): SalesCutData => {
     watts: 0,
     numeroPlacas: 0,
     redline,
-    precioBateria: 11200,
+    precioBateria,
     numeroBaterias: 0,
     gananciaConsultor: 0,
     epcVenta: 0,
     pagoCliente: 0,
     montoSubvencion: 400,
+    leadFee: 150,
+    adders: 0,
+    porcentajeComisionConsultor: 62, // Valor por defecto
   };
 };
 
@@ -72,9 +94,23 @@ export const useSalesCut = (user: string | null = null) => {
 
   const calculations = useMemo<SalesCutCalculations>(() => {
     const size = data.watts * data.numeroPlacas;
-    const precioPlacas = size * data.redline;
-    const precioTotal = precioPlacas + (data.precioBateria * data.numeroBaterias);
-    const epcBase = size > 0 ? precioTotal / size : 0;
+
+    let precioPlacas = 0;
+    let precioTotal = 0;
+    let epcBase = 0;
+
+    if (user === 'JRamos') {
+      // Fórmulas específicas para Boundless
+      precioPlacas = size * 1.52;
+      precioTotal = size * 1.52 + (9000 * data.numeroBaterias);
+      // EPC mínimo: (tamaño * 1.52 + 9000) / tamaño
+      epcBase = size > 0 ? (size * 1.52 + 9000) / size : 0;
+    } else {
+      // Fórmulas para otros usuarios
+      precioPlacas = size * data.redline;
+      precioTotal = precioPlacas + (data.precioBateria * data.numeroBaterias);
+      epcBase = size > 0 ? precioTotal / size : 0;
+    }
 
     let epcMinimo = 0;
     let diferencial = 0;
@@ -92,22 +128,52 @@ export const useSalesCut = (user: string | null = null) => {
       gananciaConsultorNeta = (diferencial * size) * 0.9;
     }
 
+    // Cálculos específicos para Boundless
+    let precioVenta = 0;
+    let comisionInstaladora = 0;
+    let ochentaPorciento = 0;
+    let montoDisponible = 0;
+    let comisionConsultor = 0;
+    let comisionGerente = 0;
+    let gananciaBruta = 0;
+
+    if (user === 'JRamos') {
+      precioVenta = size * data.epcVenta;
+      gananciaBruta = precioVenta - precioTotal; // Ganancia bruta = precio de venta - costo total del equipo
+      comisionInstaladora = gananciaBruta * 0.20; // 20% de la ganancia bruta
+      ochentaPorciento = gananciaBruta * 0.80; // 80% de la ganancia bruta
+      montoDisponible = ochentaPorciento - data.leadFee - data.adders;
+      comisionConsultor = montoDisponible * (data.porcentajeComisionConsultor / 100);
+      comisionGerente = montoDisponible - comisionConsultor;
+    }
+
     return {
       size,
       precioPlacas,
       precioTotal,
       epcMinimo,
       diferencial,
-      gananciaConsultorNeta
+      gananciaConsultorNeta,
+      precioVenta,
+      comisionInstaladora,
+      ochentaPorciento,
+      montoDisponible,
+      comisionConsultor,
+      comisionGerente,
+      gananciaBruta
     };
-  }, [data]);
+  }, [data, user]);
 
   const results = useMemo<SalesCutResults>(() => ({
     sizeKW: formatDecimal(calculations.size / 1000),
     costoTotalEquipo: formatDecimal(calculations.precioTotal),
     gananciaConsultorNeta: formatDecimal(calculations.gananciaConsultorNeta, 2),
     epcMinimoSunrun: formatDecimal(calculations.epcMinimo),
-    diferencial: formatDecimal(calculations.diferencial)
+    diferencial: formatDecimal(calculations.diferencial),
+    comisionInstaladora: formatDecimal(calculations.comisionInstaladora, 2),
+    comisionConsultor: formatDecimal(calculations.comisionConsultor, 2),
+    comisionGerente: formatDecimal(calculations.comisionGerente, 2),
+    gananciaBruta: formatDecimal(calculations.gananciaBruta, 2)
   }), [calculations]);
 
   const copyToClipboard = useCallback(() => {

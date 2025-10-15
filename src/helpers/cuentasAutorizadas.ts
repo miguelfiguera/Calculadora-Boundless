@@ -17,6 +17,10 @@ const getAccountsFromEnv = (): Record<string, Account> => {
       user: import.meta.env.VITE_ELIAS_USER || "",
       password: import.meta.env.VITE_ELIAS_PASSWORD || "",
     },
+    JRamos: {
+      user: import.meta.env.VITE_JRAMOS_USER || "",
+      password: import.meta.env.VITE_JRAMOS_PASSWORD || "",
+    },
   };
 };
 

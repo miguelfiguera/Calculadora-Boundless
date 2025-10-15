@@ -9,6 +9,7 @@ const Calculator: React.FC = () => {
   const { data, results, updateField, copyToClipboard, reset } = useSalesCut(user);
   const [copied, setCopied] = useState(false);
   const isHorizon = user === 'Horizon';
+  const isJRamos = user === 'JRamos';
 
   const handleCopy = () => {
     copyToClipboard();
@@ -21,7 +22,7 @@ const Calculator: React.FC = () => {
       <div className="bg-gray-800 shadow-lg px-4 py-4 mb-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-white">Maximo Energy Calculator</h1>
+            <h1 className="text-xl font-bold text-white">Boundless Calculator</h1>
             <p className="text-sm text-gray-400">{user}</p>
           </div>
           <button
@@ -65,7 +66,7 @@ const Calculator: React.FC = () => {
             />
 
             <InputField
-              label="Redline"
+              label={isJRamos ? "Baseline" : "Redline"}
               name="redline"
               value={data.redline}
               onChange={(value) => updateField('redline', parseFloat(value) || 0)}
@@ -89,16 +90,6 @@ const Calculator: React.FC = () => {
               value={data.numeroBaterias}
               onChange={(value) => updateField('numeroBaterias', parseInt(value) || 0)}
               placeholder="Cantidad de baterías"
-            />
-
-            <InputField
-              label="Ganancia del Consultor"
-              name="gananciaConsultor"
-              value={data.gananciaConsultor}
-              onChange={(value) => updateField('gananciaConsultor', parseFloat(value) || 0)}
-              placeholder="Valor con 2 decimales"
-              isDecimal={true}
-              step="0.01"
             />
 
             <InputField
@@ -132,9 +123,66 @@ const Calculator: React.FC = () => {
                 required={false}
               />
             )}
+
+            {isJRamos && (
+              <>
+                <InputField
+                  label="Lead Fee"
+                  name="leadFee"
+                  value={`-$${data.leadFee}`}
+                  onChange={() => {}} // No se puede modificar
+                  placeholder="-$150"
+                  type="text"
+                  required={false}
+                  disabled={true}
+                />
+
+                <InputField
+                  label="Adders ($)"
+                  name="adders"
+                  value={data.adders}
+                  onChange={(value) => updateField('adders', parseFloat(value) || 0)}
+                  placeholder="Monto adicional"
+                  isDecimal={true}
+                  required={false}
+                />
+              </>
+            )}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
+          {isJRamos && (
+            <div className="mt-6 mb-6 p-6 bg-gray-700 rounded-lg">
+              <label className="block text-sm font-medium text-gray-300 mb-4">
+                Ajustar Comisión del Consultor: {data.porcentajeComisionConsultor}%
+              </label>
+              <div className="flex items-center gap-4 mb-3">
+                <span className="text-xs text-gray-400">50%</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="4"
+                  step="1"
+                  value={[50, 60, 62, 64, 66].indexOf(data.porcentajeComisionConsultor)}
+                  onChange={(e) => {
+                    const index = parseInt(e.target.value);
+                    const porcentajes = [50, 60, 62, 64, 66];
+                    updateField('porcentajeComisionConsultor', porcentajes[index]);
+                  }}
+                  className="flex-1 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <span className="text-xs text-gray-400">66%</span>
+              </div>
+              <div className="flex justify-between px-2">
+                <span className="text-xs text-gray-500">50%</span>
+                <span className="text-xs text-gray-500">60%</span>
+                <span className="text-xs text-gray-500">62%</span>
+                <span className="text-xs text-gray-500">64%</span>
+                <span className="text-xs text-gray-500">66%</span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <button
               onClick={handleCopy}
               className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
@@ -155,7 +203,7 @@ const Calculator: React.FC = () => {
           </div>
         </div>
 
-        <Results results={results} />
+        <Results results={results} user={user} />
       </div>
     </div>
   );

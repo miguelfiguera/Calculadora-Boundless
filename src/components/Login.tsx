@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import boundlessLogo from '../assets/Boundless logo.webp';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -25,8 +26,15 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4 py-12">
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
         <div className="mb-8">
+          <div className="flex justify-center mb-6">
+            <img
+              src={boundlessLogo}
+              alt="Boundless Logo"
+              className="w-32 h-32 object-contain"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-white text-center mb-2">
-            Maximo Energy Calculator
+            Boundless Calculator
           </h1>
           <p className="text-gray-500 text-center text-xs mb-3">
             MadeBy - <a
