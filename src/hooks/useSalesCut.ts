@@ -180,19 +180,37 @@ export const useSalesCut = (user: string | null = null) => {
     const currentDate = new Date().toLocaleDateString('es-ES');
     const pagoConSubvencion = data.pagoCliente - data.montoSubvencion;
 
-    let text = `Sistema: ${data.numeroPlacas} Placas - ${data.watts} Watts + Baterías: ${data.numeroBaterias}
+    let text = '';
+
+    if (user === 'JRamos') {
+      // Estructura para Boundless
+      const porcentajeGerente = 100 - data.porcentajeComisionConsultor;
+      text = `Sistema: ${data.numeroPlacas} Placas - ${data.watts} Watts + Baterías: ${data.numeroBaterias}
+Nombre del Cliente: ${data.nombreCliente}
+EPC de venta: ${data.epcVenta || ''}
+Ganancia por KW: ${formatDecimal(calculations.diferencial)}
+Ganancia de Consultor (${data.porcentajeComisionConsultor}%): $${formatDecimal(calculations.comisionConsultor, 2)}
+Ganancia de Gerente (${porcentajeGerente}%): $${formatDecimal(calculations.comisionGerente, 2)}
+Comisión Instaladora (20%): $${formatDecimal(calculations.comisionInstaladora, 2)}
+Adders: $${data.adders || 0}
+Pago Cliente: $${data.pagoCliente || ''}
+Fecha: ${currentDate}`;
+    } else {
+      // Estructura para otros usuarios
+      text = `Sistema: ${data.numeroPlacas} Placas - ${data.watts} Watts + Baterías: ${data.numeroBaterias}
 Nombre del Cliente: ${data.nombreCliente}
 EPC de venta: ${data.epcVenta || ''}
 Ganancia Consultor por kw: ${formatDecimal(calculations.diferencial)}
 Ganancia Consultor (-10%): $${formatDecimal(calculations.gananciaConsultorNeta, 2)}
 Pago Cliente: $${data.pagoCliente || ''}`;
 
-    // Solo agregar pago con subvención si ES Horizon
-    if (user === 'Horizon') {
-      text += `\nPago Cliente con subvención: $${pagoConSubvencion}`;
-    }
+      // Solo agregar pago con subvención si ES Horizon
+      if (user === 'Horizon') {
+        text += `\nPago Cliente con subvención: $${pagoConSubvencion}`;
+      }
 
-    text += `\nFecha: ${currentDate}`;
+      text += `\nFecha: ${currentDate}`;
+    }
 
     navigator.clipboard.writeText(text);
     return text;
