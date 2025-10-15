@@ -189,9 +189,9 @@ export const useSalesCut = (user: string | null = null) => {
 Nombre del Cliente: ${data.nombreCliente}
 EPC de venta: ${data.epcVenta || ''}
 Ganancia por KW: ${formatDecimal(calculations.diferencial)}
+Comisión Instaladora: $${formatDecimal(calculations.comisionInstaladora, 2)}
 Ganancia de Consultor (${data.porcentajeComisionConsultor}%): $${formatDecimal(calculations.comisionConsultor, 2)}
 Ganancia de Gerente (${porcentajeGerente}%): $${formatDecimal(calculations.comisionGerente, 2)}
-Comisión Instaladora (20%): $${formatDecimal(calculations.comisionInstaladora, 2)}
 Adders: $${data.adders || 0}
 Pago Cliente: $${data.pagoCliente || ''}
 Fecha: ${currentDate}`;
